@@ -91,14 +91,23 @@ Project Structure
 Workflow Diagram
 
 Terraform (local)
+
       │
+      
       ▼
+      
   AWS EC2 Instance
+  
       │
+      
       ▼
+      
  Ansible (local) → Configures EC2 → Installs Nginx & Deploys HTML
+ 
       │
+      
       ▼
+      
   Browser Access → Live Web Page
   
 Learning Points
