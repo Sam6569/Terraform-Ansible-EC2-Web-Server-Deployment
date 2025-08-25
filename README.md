@@ -27,12 +27,15 @@ This project demonstrates how to **provision an AWS EC2 instance using Terraform
    ```bash
    git clone <your-repo-url>
    cd <repo-directory>
+   
 Initialize Terraform:
 
 terraform init
+
 Apply Terraform to create resources:
 
 terraform apply
+
 Note the EC2 public IP from Terraform output:
 
 terraform output ec2_public_ip
@@ -41,34 +44,48 @@ terraform output ec2_public_ip
 Create inventory.yaml with the public IP of your EC2:
 
 all:
+
   hosts:
+  
     webserver:
+    
       ansible_host: <EC2_PUBLIC_IP>
+      
       ansible_user: ec2-user
+      
       ansible_ssh_private_key_file: ~/.ssh/id_rsa
+      
 Run the Ansible playbook:
 
 ansible-playbook -i inventory.yaml webserver.yml
+
 Verify in your browser:
 
 
 http://<EC2_PUBLIC_IP>
+
 Notes
 Ensure your private SSH key has proper permissions:
 
 
 chmod 600 ~/.ssh/id_rsa
+
 This project uses Amazon Linux 2023, so yum/dnf is used instead of apt.
 
 Project Structure
 
 ├── terraform/
+
 │   ├── main.tf
+
 │   ├── ec2.tf
 
 ├── ansible/
+
 │   ├── inventory.yaml
+
 │   └── webserver.yaml
+
 └── README.md
 
 Learning Points
