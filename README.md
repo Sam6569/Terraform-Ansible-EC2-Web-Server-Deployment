@@ -1,126 +1,105 @@
-# Terraform-Ansible-EC2-Web-Server-Deployment
-This project demonstrates how to **provision an AWS EC2 instance using Terraform** and **configure it automatically using Ansible**. By the end, you will have a live web server running **Nginx** with a custom HTML page.
+# Terraform-Ansible EC2 Web Server Deployment
 
-## Features
+Automated AWS EC2 web server deployment using Terraform for infrastructure provisioning and Ansible for configuration management.
 
-- Provision EC2 instance with Terraform
-  - Create key pairs
-  - Set up security groups (SSH and HTTP access)
-- Configure EC2 instance with Ansible
-  - Install and start Nginx
-  - Deploy a custom HTML page
-- Fully automated workflow (no manual server configuration required)
+## Overview
+
+This project demonstrates Infrastructure as Code (IaC) by:
+- **Terraform**: Provisions AWS EC2 instance with security groups and SSH key pairs
+- **Ansible**: Configures the instance with Nginx web server and custom content
+
+## Architecture
+
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│  Terraform  │───▶│   AWS EC2   │◀───│   Ansible   │
+│ (Provision) │    │ (Instance)  │    │ (Configure) │
+└─────────────┘    └─────────────┘    └─────────────┘
+```
 
 ## Prerequisites
 
-- [AWS CLI](https://aws.amazon.com/cli/)
-- Terraform installed (v1.x recommended)
-- Ansible installed (v2.x recommended)
-- AWS account with proper IAM permissions
-- WSL or Linux/Mac environment (Windows users need WSL for proper key permissions)
+- AWS CLI configured with credentials
+- Terraform >= 1.0
+- Ansible >= 2.9
+- SSH key pair (`~/.ssh/id_rsa` and `~/.ssh/id_rsa.pub`)
 
-## Setup
+## Quick Start
 
-### 1. Terraform
+### 1. Deploy Infrastructure
 
-1. Clone the repository:
-   ```bash
-   git clone <your-repo-url>
-   cd <repo-directory>
-   
-Initialize Terraform:
-
+```bash
+# Initialize Terraform
 terraform init
 
-Apply Terraform to create resources:
+# Plan deployment
+terraform plan
 
+# Apply configuration
 terraform apply
+```
 
-Note the EC2 public IP from Terraform output:
+### 2. Configure Server
 
+```bash
+# Get EC2 public IP
 terraform output ec2_public_ip
 
-2. Ansible
-Create inventory.yaml with the public IP of your EC2:
-
+# Create Ansible inventory
+cat > inventory.yml << EOF
 all:
-
   hosts:
-  
     webserver:
-    
       ansible_host: <EC2_PUBLIC_IP>
-      
       ansible_user: ec2-user
-      
       ansible_ssh_private_key_file: ~/.ssh/id_rsa
-      
-Run the Ansible playbook:
+EOF
 
-ansible-playbook -i inventory.yaml webserver.yml
+# Run Ansible playbook
+ansible-playbook -i inventory.yml webserver.yml
+```
 
-Verify in your browser:
+### 3. Access Web Server
 
+Open browser: `http://<EC2_PUBLIC_IP>`
 
-http://<EC2_PUBLIC_IP>
+## Project Structure
 
-Notes
-Ensure your private SSH key has proper permissions:
+```
+├── main.tf          # AWS provider, key pair, security group
+├── ec2.tf           # EC2 instance and outputs
+├── .gitignore       # Terraform state files exclusion
+└── README.md        # This file
+```
 
+## Resources Created
 
-chmod 600 ~/.ssh/id_rsa
+- **EC2 Instance**: t2.micro Amazon Linux 2023
+- **Security Group**: SSH (22) and HTTP (80) access
+- **Key Pair**: For SSH authentication
 
-This project uses Amazon Linux 2023, so yum/dnf is used instead of apt.
+## Configuration
 
-Project Structure
+### AWS Provider
+- Region: `us-east-1`
+- Profile: `Sam` (update in `main.tf`)
 
-├── terraform/
+### Security Group Rules
+- Inbound: SSH (22), HTTP (80)
+- Outbound: All traffic allowed
 
-│   ├── main.tf
+## Cleanup
 
-│   ├── ec2.tf
+```bash
+terraform destroy
+```
 
-├── ansible/
+## Notes
 
-│   ├── inventory.yaml
+- Ensure SSH key permissions: `chmod 600 ~/.ssh/id_rsa`
+- AMI ID is region-specific (currently set for us-east-1)
+- Update AWS profile name in `main.tf` as needed
 
-│   └── webserver.yaml
+## License
 
-└── README.md
-
-Workflow Diagram
-
-Terraform (local)
-
-      │
-      
-      ▼
-      
-  AWS EC2 Instance
-  
-      │
-      
-      ▼
-      
- Ansible (local) → Configures EC2 → Installs Nginx & Deploys HTML
- 
-      │
-      
-      ▼
-      
-  Browser Access → Live Web Page
-  
-Learning Points
-Combining Terraform (infrastructure as code) with Ansible (configuration management)
-
-Handling SSH key permissions in WSL
-
-Understanding package management differences between Amazon Linux 2 and 2023
-
-Deploying a live web server in AWS automatically
-
-License
 MIT License
-
-
-
